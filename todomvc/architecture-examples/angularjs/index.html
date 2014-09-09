@@ -8,6 +8,12 @@
 		<style>[ng-cloak] { display: none; }</style>
 	</head>
 	<body>
+	    <section id="groupsel">				
+		  <form id="groupsel-form" ng-submit="thisGroup()">
+					<input id="gs" placeholder="Which Group?" ng-model="groupName" autofocus>
+					</input></form>
+		</section>
+
 		<section id="todoapp" ng-controller="TodoCtrl">
 			<header id="header">
 				<h1>todos</h1>
