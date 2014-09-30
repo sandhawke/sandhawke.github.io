@@ -47,8 +47,9 @@ function handleResponse(responseText) {
 	while(out.firstChild) { out.removeChild(out.firstChild) }
 	for (i=0; i<messages.length; i++) {
 		var message = messages[i];
+		message.timeDate = new Date(Number(message.time))
 		var div = document.createElement("div");
-		div.innerHTML = message.time+" "+message._owner+" "+message.text;
+		div.innerHTML = message.timeDate.toLocaleString()+" "+message._owner+" "+message.text;
 		out.appendChild(div);
 	}
 	document.getElementById("chat").style.visibility = "visible"
