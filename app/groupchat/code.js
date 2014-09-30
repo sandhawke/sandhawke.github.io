@@ -1,6 +1,6 @@
 "use strict";
 
-var etag=0;
+var etag=null;
 
 function podURL() {
 	// temporary hack until we have a nice way for users to select their pod
@@ -14,11 +14,13 @@ function reload() {
 	var request = new XMLHttpRequest();
 
 	// just fetch everything, for now, since queries don't work yet
-	request.open("GET", podURL(), true);
-	request.setRequestHeader("Wait-For-Not-Match", etag);
+	request.open("GET", podURL()+"/_nearby", true);
+	if (etag !== null) {
+		request.setRequestHeader("Wait-For-None-Match", etag);
+	}
 
 	request.onreadystatechange = function() {
-    if (request.readyState==4 && request.status==200) {
+		if (request.readyState==4 && request.status==200) {
     		handleResponse(request.responseText);
     	}
  	}
@@ -29,7 +31,6 @@ function reload() {
 function handleResponse(responseText) {
 	var responseJSON = JSON.parse(responseText);
 	etag = responseJSON._etag;
-	console.log('got etag', etag);
 	var all = responseJSON._members;
 	var messages = [];
 	for (var i=0; i<all.length; i++) {
@@ -66,15 +67,11 @@ function newmsg() {
     	request.onreadystatechange = function() {
             if (request.readyState==4 && request.status==201) {
 				// why does this always print null, even though it's not?
-				console.log("Location:", request.getResponseHeader("Location"));
-				// reload();   (not if it's already looping!)
+				// console.log("Location:", request.getResponseHeader("Location"));
      		}
 		}
 		request.setRequestHeader("Content-type", "application/json");
 		var content = JSON.stringify({text:message, time:Date.now()});
 		request.send(content);
-	} else {
-		reload();
-
-	}
+	} 
 }
