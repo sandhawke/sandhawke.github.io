@@ -14,7 +14,7 @@ function reload() {
 		var responseJSON = JSON.parse(responseText);
 		gotVersion = responseJSON._version;
 		console.log('got version', gotVersion);
-		var all = responseJSON.resources;
+		var all = responseJSON._members;
 		var messages = [];
 		for (var i=0; i<all.length; i++) {
 			var item = all[i];
