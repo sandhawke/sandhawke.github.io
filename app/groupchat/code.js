@@ -1,57 +1,61 @@
 "use strict";
 
-var gotVersion=0;
+var etag=0;
 
 function podURL() {
 	// temporary hack until we have a nice way for users to select their pod
-	return "http://"+document.getElementById("username").value+".fakepods.com";
+	//return "http://"+document.getElementById("username").value+".fakepods.com";
+	return document.getElementById("podurl").value
 }
+
 
 function reload() {
-	// just fetch everything, for now, since queries don't work yet
-	httpGet(podURL()+"/**?wait-for-version-after="+gotVersion, function(responseText) {
 
-		var responseJSON = JSON.parse(responseText);
-		gotVersion = responseJSON._version;
-		console.log('got version', gotVersion);
-		var all = responseJSON._members;
-		var messages = [];
-		for (var i=0; i<all.length; i++) {
-			var item = all[i];
-			// consider the 'text' property to be the essential one
-			if ('text' in item) {
-				messages.push(item)
-			}
-		}
-		messages.sort(function(a,b){return a.time-b.time});
-
-		// not being clever, just remove and re-create the whole "out" element
-		var out = document.getElementById("out")
-		while(out.firstChild) { out.removeChild(out.firstChild) }
-		for (i=0; i<messages.length; i++) {
-			var message = messages[i];
-			var div = document.createElement("div");
-			div.innerHTML = message.time+" "+message._owner+" "+message.text;
-			out.appendChild(div);
-		}
-		document.getElementById("chat").style.visibility = "visible"
-		// wait for 100ms then reload when there's new data.  If data
-		// comes faster than that, we don't really want it.
-		setTimeout(reload, 50);
-		
-	})
-}
-
-function httpGet(url, callback) {
 	var request = new XMLHttpRequest();
-	request.open("GET", url, true);
+
+	// just fetch everything, for now, since queries don't work yet
+	request.open("GET", podURL(), true);
+	request.setRequestHeader("Wait-For-Not-Match", etag);
+
 	request.onreadystatechange = function() {
     if (request.readyState==4 && request.status==200) {
-    		callback(request.responseText);
+    		handleResponse(request.responseText);
     	}
  	}
+
 	request.send();
 }
+
+function handleResponse(responseText) {
+	var responseJSON = JSON.parse(responseText);
+	etag = responseJSON._etag;
+	console.log('got etag', etag);
+	var all = responseJSON._members;
+	var messages = [];
+	for (var i=0; i<all.length; i++) {
+		var item = all[i];
+		// consider the 'text' property to be the essential one
+		if ('text' in item) {
+			messages.push(item)
+		}
+	}
+	messages.sort(function(a,b){return a.time-b.time});
+	
+	// not being clever, just remove and re-create the whole "out" element
+	var out = document.getElementById("out")
+	while(out.firstChild) { out.removeChild(out.firstChild) }
+	for (i=0; i<messages.length; i++) {
+		var message = messages[i];
+		var div = document.createElement("div");
+		div.innerHTML = message.time+" "+message._owner+" "+message.text;
+		out.appendChild(div);
+	}
+	document.getElementById("chat").style.visibility = "visible"
+	// wait for 100ms then reload when there's new data.  If data
+	// comes faster than that, we don't really want it.
+	setTimeout(reload, 50);
+}
+
 
 function newmsg() {
     var message = document.getElementById("message").value;
