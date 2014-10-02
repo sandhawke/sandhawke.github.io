@@ -30,9 +30,9 @@ var pod = function () {
     //    _owner is the id of the system (pod) which owns this object
     //    _etag is a string which will change whenever any part of the 
     //     object changes.  In general etags will never be reused, although
-	//     they can be if the item returns to a prior state.
-	//    _public is a boolean indicating whether the item is visible to
-	//     the public or requires authorization to read
+    //     they can be if the item returns to a prior state.
+    //    _public is a boolean indicating whether the item is visible to
+    //     the public or requires authorization to read
     //    _content when present means that this resource behaves in part 
     //     as a conventional web page.   This might be html, css, javascript, 
     //     a jpeg, etc.   Requires _contentType also be set
@@ -56,7 +56,7 @@ var pod = function () {
     // 
     // return error if etag provided and item has changed
     // since it had that etag; this allows client to make
-	// sure no one else has changed it
+    // sure no one else has changed it
     // 
     // calls callback(err) when done
     pod.setItem = function (id, newData, etag, callback) {
@@ -71,26 +71,26 @@ var pod = function () {
     pod.getItem = function (id, callback) {
     };
 
-	// removes the item
-	pod.removeItem = function (id, callback) {
-	};
+    // removes the item
+    pod.removeItem = function (id, callback) {
+    };
 
-	// removes the item and all other items which have an id whose
-	// text begins with the test of id.
-	pod.removeTree = function (id, callback) {
-	};
+    // removes the item and all other items which have an id whose
+    // text begins with the test of id.
+    pod.removeTree = function (id, callback) {
+    };
 
-	// changes the items id from oldId to newId.  May be much more
-	// efficient thant get+set, and also tells others about the move,
-	// leaving in place a 301 Moved Permanently
-	pod.moveItem = function (oldId, newId, callback) {
-	}
+    // changes the items id from oldId to newId.  May be much more
+    // efficient thant get+set, and also tells others about the move,
+    // leaving in place a 301 Moved Permanently
+    pod.moveItem = function (oldId, newId, callback) {
+    }
 
-	// like moveItem but also moves all items who have an id whose
-	// text begins with the text of oldId; in the new location, that
-	// suffix will remain.
-	pod.moveTree = function(oldId, newId, callback) {
-	}
+    // like moveItem but also moves all items who have an id whose
+    // text begins with the text of oldId; in the new location, that
+    // suffix will remain.
+    pod.moveTree = function(oldId, newId, callback) {
+    }
 
 
 
@@ -248,21 +248,21 @@ var pod = function () {
     //                  errors, but mostly it allows for somewhat efficient
     //                  rule execution (that is, backward chaining)
     //
-	//  All of the JS bits should be considered to be running in a highly
-	//  constrained/sandboxed environment.
-	//
-	//  In general, complex queries should be broken down into rules.
-	//
-	//  @@@todo: decide how these differ from normal items.  If you created
-	//  an item with these fields, or someone else did, would it automatically
-	//  be used?   I think maybe, give or take trust/provenance limits.
-	//
-	//  so maybe we need a rule-filtering-rule?  :-)
-	//
-	pod.addRule = function (ruleObject) {
-	}
-	pod.removeRule = function (ruleObject) {
-	}
+    //  All of the JS bits should be considered to be running in a highly
+    //  constrained/sandboxed environment.
+    //
+    //  In general, complex queries should be broken down into rules.
+    //
+    //  @@@todo: decide how these differ from normal items.  If you created
+    //  an item with these fields, or someone else did, would it automatically
+    //  be used?   I think maybe, give or take trust/provenance limits.
+    //
+    //  so maybe we need a rule-filtering-rule?  :-)
+    //
+    pod.addRule = function (ruleObject) {
+    }
+    pod.removeRule = function (ruleObject) {
+    }
 
     // See and/or change access control rules for some item
     //
