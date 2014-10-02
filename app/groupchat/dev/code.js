@@ -83,6 +83,7 @@ function newmsg() {
 var presencePage = null;
 function enterChat() {
 	if (podURL() && presencePage == null) {
+		presencePage = "FOO"
 		var request = new XMLHttpRequest();
 		request.open("POST", podURL());
     	request.onreadystatechange = function(r) {
