@@ -148,16 +148,16 @@ var pod = function () {
 
     }
 
-	// get notified when a particular item changes.   watcher is:
-	//
-	//   w.item      id of the item to watch
-	//   w.onupdate  called with new value (or with just the modified fields?)
-	//   w.onmove    called with newid (might also appear as onupdate on _id)
-	//   w.onremove  called with no args
-	pod.addItemWatcher = function(watcher) {
-	}
-	pod.removeItemWatcher = function(watcher) {
-	}
+    // get notified when a particular item changes.   watcher is:
+    //
+    //   w.item      id of the item to watch
+    //   w.onupdate  called with new value (or with just the modified fields?)
+    //   w.onmove    called with newid (might also appear as onupdate on _id)
+    //   w.onremove  called with no args
+    pod.addItemWatcher = function(watcher) {
+    }
+    pod.removeItemWatcher = function(watcher) {
+    }
 
     // Set up a query for certain objects (in this user's pod or in
     // someone else's pod that's accessible and determined to be
@@ -167,11 +167,11 @@ var pod = function () {
     // being added, access control being changed, network access
     // proceeding, processing proceeding, etc.
     //
-	// Query items do NOT have _id, etc, unless those properties are
-	// requested, and if a join is done are not subsets of objects anyone
-	// added.   (Similarly, provenance information will be provided only
-	// if asked for in the query.)
-	//
+    // Query items do NOT have _id, etc, unless those properties are
+    // requested, and if a join is done are not subsets of objects anyone
+    // added.   (Similarly, provenance information will be provided only
+    // if asked for in the query.)
+    //
     // Query Objects should be:
     //
     //   q.add    = function(newItem)
@@ -188,10 +188,10 @@ var pod = function () {
     //       elements which reflect this value.  After q.remove is
     //       called on it once, it will never be used again.
     //
-	//   q.properties = [ ... ]
-	//
-	//       list of properties worth returning.  If not given, then
-	//       all available ones are returned.
+    //   q.properties = [ ... ]
+    //
+    //       list of properties worth returning.  If not given, then
+    //       all available ones are returned.
 
     //   q.filters = [ filter ]
     //
@@ -203,13 +203,13 @@ var pod = function () {
     //       - an array [property, operator, value], like ['age','>',21]
     //
     //       (other details TBD)
-	//
-	//   q.filterJS = "item.a > item.b && item.c = var.x && var.x.name=='foo'"
-	//
-	//       This is a JavaScript expression, in a string, which has two
-	//       predefined terms, "item" and "var".  The query matches for every
-	//       item which makes this true for some var.  Only defined properties
-	//       may be used.
+    //
+    //   q.filterJS = "item.a > item.b && item.c = var.x && var.x.name=='foo'"
+    //
+    //       This is a JavaScript expression, in a string, which has two
+    //       predefined terms, "item" and "var".  The query matches for every
+    //       item which makes this true for some var.  Only defined properties
+    //       may be used.
     //
     //   q.complete = function()
     //   q.completeWithItems = function(items)
@@ -231,23 +231,23 @@ var pod = function () {
     pod.removeQuery = function (queryObject) {
     }
 
-	//  (This is a sketch of something we probably want...)
-	//
-	//  r.ifJS          an expression like q.filterJS
-	//  r.thenValuesJS  an object whose keys are properties and values are 
+    //  (This is a sketch of something we probably want...)
+    //
+    //  r.ifJS          an expression like q.filterJS
+    //  r.thenValuesJS  an object whose keys are properties and values are 
     //                  JavaScript expressions to run when ifJS is true;
-	//                  the values of item and var will be assigned before
-	//                  these are evaluated.  This will be a new item unless
-	//                  it has { _id: "_id" } 
-	//                  We could do without this part, but we'd have extra
-	//                  work calculating fields that might not be asked for
-	//  r.thenCommonJS  some JS code to run after ifJS is matched and before
-	//                  r.thenValuesJS expressions are evaluated
-	//  r.thenConstraintJS  an expression like q.filterJS which is required
-	//                  to be true at rule completion.  This may help catch
-	//                  errors, but mostly it allows for somewhat efficient
-	//                  rule execution (that is, backward chaining)
-	//
+    //                  the values of item and var will be assigned before
+    //                  these are evaluated.  This will be a new item unless
+    //                  it has { _id: "_id" } 
+    //                  We could do without this part, but we'd have extra
+    //                  work calculating fields that might not be asked for
+    //  r.thenCommonJS  some JS code to run after ifJS is matched and before
+    //                  r.thenValuesJS expressions are evaluated
+    //  r.thenConstraintJS  an expression like q.filterJS which is required
+    //                  to be true at rule completion.  This may help catch
+    //                  errors, but mostly it allows for somewhat efficient
+    //                  rule execution (that is, backward chaining)
+    //
 	//  All of the JS bits should be considered to be running in a highly
 	//  constrained/sandboxed environment.
 	//
