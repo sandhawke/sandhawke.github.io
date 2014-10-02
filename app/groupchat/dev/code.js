@@ -10,7 +10,7 @@ function podURL() {
 
 
 function reload() {
-
+	enterChat();
 	var request = new XMLHttpRequest();
 
 	// just fetch everything, for now, since queries don't work yet
@@ -26,6 +26,8 @@ function reload() {
  	}
 
 	request.send();
+
+	
 }
 
 function handleResponse(responseText) {
@@ -76,3 +78,33 @@ function newmsg() {
 		request.send(content);
 	} 
 }
+
+
+var presencePage = null;
+function enterChat() {
+	if (podURL() && presencePage == null) {
+		var request = new XMLHttpRequest();
+		request.open("POST", podURL());
+    	request.onreadystatechange = function(r) {
+			console.log('r=', r)
+			console.log('r=request', r===request)
+            if (request.readyState==4 && request.status==201) {
+				// why does this always print null, even though it's not?
+				// console.log("Location:", request.getResponseHeader("Location"));
+     		}
+		}
+		request.setRequestHeader("Content-type", "application/json");
+		var content = JSON.stringify({inchat:podURL(), asOf:Date.now()});
+		request.send(content);
+	}
+}
+
+function exitChat() {
+	if (presencePage) {
+		var request = new XMLHttpRequest();
+		request.open("DELETE", presencePage);
+		request.send(content);
+	}
+	return null
+}
+window.onbeforeunload = exitChat
