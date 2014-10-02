@@ -1,102 +1,63 @@
 "use strict";
 
-var etag=null;
+sdd8&)*&)(
+*(&*(&(*
+	   *&*(&(*
 
-function podURL() {
-	// temporary hack until we have a nice way for users to select their pod
-	//return "http://"+document.getElementById("username").value+".fakepods.com";
-	return document.getElementById("podurl").value
-}
+console.log('document load started');
+document.addEventListener('DOMContentLoaded',function(){
+	console.log('document loaded');
+})
 
+// temporary hack until we have a nice way for users to select their pod
+var podURL = null;
 
-function reload() {
+function gotPodURL() {
+	document.getElementById("loginForm").style.visibility = "hidden";
+	podURL = document.getElementById("podurl").value
+
 	enterChat();
-	var request = new XMLHttpRequest();
-
-	// just fetch everything, for now, since queries don't work yet
-	request.open("GET", podURL()+"/_nearby", true);
-	if (etag !== null) {
-		request.setRequestHeader("Wait-For-None-Match", etag);
-	}
-
-	request.onreadystatechange = function() {
-		if (request.readyState==4 && request.status==200) {
-    		handleResponse(request.responseText);
-    	}
- 	}
-
-	request.send();
-
-	
+	renderMessages();
 }
-
-function handleResponse(responseText) {
-	var responseJSON = JSON.parse(responseText);
-	etag = responseJSON._etag;
-	var all = responseJSON._members;
-	var messages = [];
-	for (var i=0; i<all.length; i++) {
-		var item = all[i];
-		// consider the 'text' property to be the essential one
-		if ('text' in item) {
-			messages.push(item)
-		}
-	}
-	messages.sort(function(a,b){return a.time-b.time});
-	
-	// not being clever, just remove and re-create the whole "out" element
-	var out = document.getElementById("out")
-	while(out.firstChild) { out.removeChild(out.firstChild) }
-	for (i=0; i<messages.length; i++) {
-		var message = messages[i];
-		message.timeDate = new Date(Number(message.time))
-		var div = document.createElement("div");
-		div.innerHTML = message.timeDate.toLocaleString()+" "+message._owner+" "+message.text;
-		out.appendChild(div);
-	}
-	document.getElementById("chat").style.visibility = "visible"
-	// wait for 100ms then reload when there's new data.  If data
-	// comes faster than that, we don't really want it.
-	setTimeout(reload, 50);
-}
-
 
 function newmsg() {
-    var message = document.getElementById("message").value;
-	document.getElementById("message").value = "";
-    if (message) {
-     	var request = new XMLHttpRequest();
-	    request.open("POST", podURL());
-    	request.onreadystatechange = function() {
-            if (request.readyState==4 && request.status==201) {
-				// why does this always print null, even though it's not?
-				// console.log("Location:", request.getResponseHeader("Location"));
-     		}
-		}
-		request.setRequestHeader("Content-type", "application/json");
-		var content = JSON.stringify({text:message, time:Date.now()});
-		request.send(content);
-	} 
+	addToPod({text:message, time:Date.now()})
+}
+
+function renderMessages() {
+	addDataWatcher({
+		requiredProperties: ["text", "time", "_owner"],
+		updateAll: function (messages) {
+
+			// brute force, just redraw it all
+
+			messages.forEach(function (m) {
+				m.timeDate = new Date(Number(message.time))
+			});
+			messages.sort(function(a,b){return a.timeDate-b.timeDate});
+			
+			var out = document.getElementById("out")
+			while(out.firstChild) { out.removeChild(out.firstChild) }
+
+			messages.forEach(function (m) {
+				var div = document.createElement("div");
+				div.innerHTML = m.timeDate.toLocaleString()+" "+m._owner+" "
+				// prevent HTML from being rendered
+				div.appendChild(document.createTextNode(m.text));
+				out.appendChild(div);
+			});
+			document.getElementById("chat").style.visibility = "visible"
+		}});
 }
 
 
-var presencePage = null;
+var myPresencePage = null;
+
 function enterChat() {
-	if (podURL() && presencePage == null) {
-		presencePage = "FOO"
-		var request = new XMLHttpRequest();
-		request.open("POST", podURL());
-    	request.onreadystatechange = function(r) {
-			console.log('r=', r)
-			console.log('r=request', r===request)
-            if (request.readyState==4 && request.status==201) {
-				// why does this always print null, even though it's not?
-				// console.log("Location:", request.getResponseHeader("Location"));
-     		}
-		}
-		request.setRequestHeader("Content-type", "application/json");
-		var content = JSON.stringify({inchat:podURL(), asOf:Date.now()});
-		request.send(content);
+	if (myPresencePage == null) {
+		addToPod({inchat:podURL, asOf:Date.now()}, function(ref) {
+			myPresencePage = ref
+		});
 	}
 }
 
@@ -109,3 +70,84 @@ function exitChat() {
 	return null
 }
 window.onbeforeunload = exitChat
+
+//////////////////////////////////////////
+//  
+//   basic pod access stuff
+//
+////////////////////////////////////////
+
+// Send this JS object to the user's pod to be stored.  When it's saved 
+// the callback function is called with the URL of the new page where this
+// is stored.  We can PUT to update it or DELETE to get rid of it.
+function addToPod(msg, callback) {
+	if (podURL) {
+		var request = new XMLHttpRequest();
+		request.open("POST", podURL);
+    	request.onreadystatechange = function(event) {
+            if (request.readyState==4 && request.status==201) {
+				if (callback) {
+					callback(request.getResponseHeader("Location"));
+				}
+     		}
+		}
+		request.setRequestHeader("Content-type", "application/json");
+		request.send(JSON.stringify(msg));
+	}
+}
+
+// The callback will be called, with a list of all available objects
+// whenever data in that list changes
+//
+// Assumes podURL is already set and doesn't change
+//
+// if requiredProperties, then only return objects where they are not
+// null
+//
+var etag=null;
+var dataWatchers=[];
+function addDataWatcher(w) {
+	dataWatchers.push(w);
+	if (x.length == 1) _requestData()
+}
+
+function _requestData() {
+	var request = new XMLHttpRequest();
+	request.open("GET", podURL+"/_nearby", true);
+	if (etag !== null) {
+		request.setRequestHeader("Wait-For-None-Match", etag);
+	}
+	request.onreadystatechange = function() {
+		if (request.readyState==4 && request.status==200) {
+			var responseJSON = JSON.parse(request.responseText);
+			var items = responseJSON._members
+
+			// call w.reset() on each watcher, then w.add(item) for
+			// each appropriate item, finally w.done()
+			dataWatchers.forEach(function (w) {
+				w.reset()
+				items.forEach(function (item) {
+					var hasThemAll = true;
+					w.requiredProperties.forEach(function (rp) {
+						if (!item.hasOwnProperty(rp)) hasThemAll = false;
+					});
+					if (hasThemAll) {
+						w.add(item)
+					}
+				})
+				w.done()
+			}
+
+			// should get this from http, but server isn't sending it yet
+			etag = responseJSON._etag;
+			for (var i=0; i<dataWatchers.length; i++) {
+				dataWatchers[i](members)
+			}
+		}
+
+		// wait a bit request to be told when there is more data.  If it's
+		// changing faster that that, we don't really care.
+		setTimeout(_requestData, 50);
+	}
+	request.send();
+}
