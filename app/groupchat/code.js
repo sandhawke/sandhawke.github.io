@@ -48,8 +48,8 @@ function handleResponse(responseText) {
 	for (i=0; i<messages.length; i++) {
 		var message = messages[i];
 		message.timeDate = new Date(Number(message.time))
-		var div = document.createElement("div");
-		div.innerHTML = message.timeDate.toLocaleString()
+		var div = document.createElement("pre");
+		div.innerHTML = message.timeDate.toLocaleString()+"  ";
 		div.appendChild(document.createTextNode(message.text));
 		out.appendChild(div);
 	}
