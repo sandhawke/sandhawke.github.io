@@ -6,15 +6,15 @@
   they want in the pod, and query for data from other apps and other
   users.
 
-  Actual login processing and network access might be done in a loaded
-  iframe, so pod providers can use modified network protocols and
-  perhaps to avoid some CORS issues.
+  When you load this library, it will add a div to the DOM with id
+  "pod-controller", which it uses to talk to the user, getting them to
+  log in, etc.
 
 */
 
 var pod = function () {
 
-    // We're using Crockford's suggest maximally-encapsulated style,
+    // We're using Crockford's suggested maximal-encapsulation style,
     // not JS's normal inheritance style, to help dissuade apps from
     // tinkering with implementation internals.
     pod = {}
@@ -74,6 +74,12 @@ var pod = function () {
     // removes the item
     pod.removeItem = function (id, callback) {
     };
+
+
+
+
+	// Somewhat more advanced data modification operations...
+	//
 
     // removes the item and all other items which have an id whose
     // text begins with the test of id.
@@ -150,49 +156,65 @@ var pod = function () {
 
     // get notified when a particular item changes.   watcher is:
     //
-    //   w.item      id of the item to watch
-    //   w.onupdate  called with new value (or with just the modified fields?)
-    //   w.onmove    called with newid (might also appear as onupdate on _id)
+    //   w.item      item to watch (not id of item)
+    //   w.onreplace called with the  new value when modified
+	//   w.onoverlay called with an overlay json object, showing changes
+    //   w.onmove    called with newid (also can appear as change to _id)
     //   w.onremove  called with no args
     pod.addItemWatcher = function(watcher) {
     }
     pod.removeItemWatcher = function(watcher) {
     }
 
+
     // Set up a query for certain objects (in this user's pod or in
     // someone else's pod that's accessible and determined to be
     // relevant).  Once the query is added, it runs until it's
     // removed.  As it's running, it updates the query object with
-    // matches which appear and disappear.  That might have do to data
+    // matches which appear and disappear.  That might be due to data
     // being added, access control being changed, network access
     // proceeding, processing proceeding, etc.
     //
-    // Query items do NOT have _id, etc, unless those properties are
-    // requested, and if a join is done are not subsets of objects anyone
-    // added.   (Similarly, provenance information will be provided only
-    // if asked for in the query.)
+    // These are FILTER queries (aka NoSQL queries), *NOT* joins.  If 
+	// you want a join, use a Rule.
     //
     // Query Objects should be:
     //
     //   q.add    = function(newItem)
-    //   q.update = function(updatedItem)
     //   q.remove = function(removedItem)
     //
     //       These signal that an object matching the query has
-    //       appeared, has changed, or has disappeared (perhaps
-    //       because it changed to no longer match the query).
+    //       appeared or has disappeared from the result set
     //
-    //       q.update and q.remove are handed the exact same object
-    //       that q.add was handed.  You can use the ._local property
-    //       of that object to put your own information, such as DOM
-    //       elements which reflect this value.  After q.remove is
-    //       called on it once, it will never be used again.
+    //       q.remove is handed the exact same object that q.add was
+    //       handed.  You can use the ._local property of that object
+    //       to put your own information, such as DOM elements which
+    //       reflect this value.  After q.remove is called on it once,
+    //       it will never be used again.
+	//
+	//       Use item watchers if it matters when particular values are
+	//       updated.  q.add and q.remove only tell you if an object
+	//       joins/leaves a result set.
+	//
+    //   q.complete = function()
+	//
+	//       Called whenever the query processing is quiecent, having
+	//       found all available results.  Will be called again if
+	//       data changes in a way which adds or removes any items.
+	//
+    //   q.allResults = function(items)
+    //       
+    //       Shortcut for add/remove/complete.  If set, called
+	//       whenever q.complete is called, but it's passed the set of
+	//       all current results.    (map or list? @@)
+    //
     //
     //   q.properties = [ ... ]
     //
     //       list of properties worth returning.  If not given, then
-    //       all available ones are returned.
-
+    //       all available ones are returned.    Generally much more
+	//       efficient to include this.
+	//
     //   q.filters = [ filter ]
     //
     //       a filter may be:
@@ -204,24 +226,14 @@ var pod = function () {
     //
     //       (other details TBD)
     //
-    //   q.filterJS = "item.a > item.b && item.c = var.x && var.x.name=='foo'"
+    //   q.filterJS = "item.a > item.b && item.c === 33 && item.d !== null"
     //
-    //       This is a JavaScript expression, in a string, which has two
-    //       predefined terms, "item" and "var".  The query matches for every
-    //       item which makes this true for some var.  Only defined properties
-    //       may be used.
-    //
-    //   q.complete = function()
-    //   q.completeWithItems = function(items)
-    //       
-    //       Called if the query has succeeded in obtaining all the
-    //       currently matching items.  Does not mean the query is
-    //       done -- as the data changes, more calls to add, update,
-    //       remove, and complete may be done.
-    //
-    //       completeWithItems is passed new array with all the
-    //       current items in it.  This is a convenience function.
-    //
+    //       This is a JavaScript expression, in a string, which has
+    //       one predefined term, "item".  The query matches for every
+    //       item which makes this true for some var.  Only defined
+    //       properties may be used.   Use === and !== not == and !=.
+	//       Probably not actually run in a JS engine; just using JS
+	//       expression syntax.   No side effects, functions, etc.
     //
     //
 
@@ -231,38 +243,17 @@ var pod = function () {
     pod.removeQuery = function (queryObject) {
     }
 
-    //  (This is a sketch of something we probably want...)
-    //
-    //  r.ifJS          an expression like q.filterJS
-    //  r.thenValuesJS  an object whose keys are properties and values are 
-    //                  JavaScript expressions to run when ifJS is true;
-    //                  the values of item and var will be assigned before
-    //                  these are evaluated.  This will be a new item unless
-    //                  it has { _id: "_id" } 
-    //                  We could do without this part, but we'd have extra
-    //                  work calculating fields that might not be asked for
-    //  r.thenCommonJS  some JS code to run after ifJS is matched and before
-    //                  r.thenValuesJS expressions are evaluated
-    //  r.thenConstraintJS  an expression like q.filterJS which is required
-    //                  to be true at rule completion.  This may help catch
-    //                  errors, but mostly it allows for somewhat efficient
-    //                  rule execution (that is, backward chaining)
-    //
-    //  All of the JS bits should be considered to be running in a highly
-    //  constrained/sandboxed environment.
-    //
-    //  In general, complex queries should be broken down into rules.
-    //
-    //  @@@todo: decide how these differ from normal items.  If you created
-    //  an item with these fields, or someone else did, would it automatically
-    //  be used?   I think maybe, give or take trust/provenance limits.
-    //
-    //  so maybe we need a rule-filtering-rule?  :-)
-    //
-    pod.addRule = function (ruleObject) {
-    }
-    pod.removeRule = function (ruleObject) {
-    }
+
+
+	//
+	//
+	//    Rule API system to go here   
+	//
+	//    Both VirtualProperty rules and DerivedItem rules
+	//
+	//
+
+
 
     // See and/or change access control rules for some item
     //
