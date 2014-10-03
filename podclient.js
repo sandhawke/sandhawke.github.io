@@ -1,4 +1,4 @@
-"use scrict";
+"use strict";
 /*
   
   In-browser API for accessing a world of linked data through the
