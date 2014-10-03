@@ -1,9 +1,5 @@
 "use strict";
 
-sdd8&)*&)(
-*(&*(&(*
-	   *&*(&(*
-
 console.log('document load started');
 document.addEventListener('DOMContentLoaded',function(){
 	console.log('document loaded');
@@ -26,13 +22,17 @@ function newmsg() {
 
 function renderMessages() {
 	addDataWatcher({
-		requiredProperties: ["text", "time", "_owner"],
+		//requiredProperties: ["text", "time", "_owner"],
+		filters: [ 
+			"text",
+			["time", ">", ""+(Date.now() - 86400)]
+		],
 		updateAll: function (messages) {
 
 			// brute force, just redraw it all
 
 			messages.forEach(function (m) {
-				m.timeDate = new Date(Number(message.time))
+				m.timeDate = new Date(Number(m.time))
 			});
 			messages.sort(function(a,b){return a.timeDate-b.timeDate});
 			
@@ -108,7 +108,7 @@ var etag=null;
 var dataWatchers=[];
 function addDataWatcher(w) {
 	dataWatchers.push(w);
-	if (x.length == 1) _requestData()
+	if (dataWatchers.length == 1) _requestData()
 }
 
 function _requestData() {
@@ -122,27 +122,25 @@ function _requestData() {
 			var responseJSON = JSON.parse(request.responseText);
 			var items = responseJSON._members
 
-			// call w.reset() on each watcher, then w.add(item) for
-			// each appropriate item, finally w.done()
+			// FOR NOW we're doing this filtering, and maybe more here
+			// the client, but soon we'll be passing it to the server.
+		
 			dataWatchers.forEach(function (w) {
-				w.reset()
+				var selected = []
 				items.forEach(function (item) {
 					var hasThemAll = true;
 					w.requiredProperties.forEach(function (rp) {
 						if (!item.hasOwnProperty(rp)) hasThemAll = false;
 					});
 					if (hasThemAll) {
-						w.add(item)
+						selected.push(item);
 					}
 				})
-				w.done()
-			}
+				w.updateAll(selected)
+			});
 
 			// should get this from http, but server isn't sending it yet
 			etag = responseJSON._etag;
-			for (var i=0; i<dataWatchers.length; i++) {
-				dataWatchers[i](members)
-			}
 		}
 
 		// wait a bit request to be told when there is more data.  If it's

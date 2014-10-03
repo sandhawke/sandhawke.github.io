@@ -4,7 +4,7 @@
   In-browser API for accessing a world of linked data through the
   user's personal online database (pod).  Apps can store whatever data
   they want in the pod, and query for data from other apps and other
-  users.
+  users (using other pods).
 
   When you load this library, it will add a div to the DOM with id
   "pod-controller", which it uses to talk to the user, getting them to
@@ -54,9 +54,11 @@ var pod = function () {
 
     // set new data for item, creating if necessary
     // 
-    // return error if etag provided and item has changed
-    // since it had that etag; this allows client to make
-    // sure no one else has changed it
+	// if an etag is provided (not null/undefined), then
+	// the system will only do the setItem if the item
+	// hasn't changed since the version with that etag.
+	// This makes it possible to over overwriting data
+	// from other sources.
     // 
     // calls callback(err) when done
     pod.setItem = function (id, newData, etag, callback) {

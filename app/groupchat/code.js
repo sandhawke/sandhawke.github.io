@@ -50,7 +50,7 @@ function handleResponse(responseText) {
 		message.timeDate = new Date(Number(message.time))
 		var div = document.createElement("div");
 		div.innerHTML = message.timeDate.toLocaleString()
-		div.appendChild(document.createTextNode(m.text));
+		div.appendChild(document.createTextNode(message.text));
 		out.appendChild(div);
 	}
 	document.getElementById("chat").style.visibility = "visible"

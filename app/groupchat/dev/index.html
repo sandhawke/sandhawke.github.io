@@ -5,13 +5,16 @@
 
 <script src="./code.js"></script>
 
+<script>
+  console.log("hmmmm");
+</script>
 <style>
 </style>
 
 </head>
 <body>
-    <form action="#" onsubmit="reload();return false;" >
-	<p style="float:right">Pod URL:<input id="podurl" type="text" size="20" value="http://demo.fakepods.com" /><input type="submit" value="OK" /><br/>Change "demo" to whatever you want.  No securty.</p>
+    <form id="loginForm" action="#" onsubmit="gotPodURL(); return false;" accept-charset="utf-8">
+	<p style="float:right">Pod URL:<input id="podurl" type="text" size="20" value="http://demo.fakepods.com" /><input type="submit" value="OK" /><br/>Change "demo" to whatever you want.  No security.</p>
 	</form>
 
 	<h1>Crosscloud Groupchat Demo</h1>
