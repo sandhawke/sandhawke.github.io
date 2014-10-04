@@ -32,6 +32,7 @@ function reload() {
 }
 
 function handleResponse(responseText) {
+	console.log('got response');
 	var responseJSON = JSON.parse(responseText);
 	etag = responseJSON._etag;
 	var all = responseJSON._members;
@@ -43,7 +44,7 @@ function handleResponse(responseText) {
 		var now = Date.now();
 		if ('text' in item && 'time' in item) {
 			item.timeDate = new Date(Number(item.time))
-			if (now - item.timeDate < 86400) {
+			if (now - item.timeDate < 86400000) {
 				messages.push(item)
 			}
 		}
