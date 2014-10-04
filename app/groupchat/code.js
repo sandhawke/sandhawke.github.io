@@ -17,6 +17,9 @@ function reload() {
 	request.open("GET", podURL()+"/_nearby", true);
 	if (etag !== null) {
 		request.setRequestHeader("Wait-For-None-Match", etag);
+		console.log('doing a long poll', etag);
+	} else {
+		console.log('initial fetch, not a long poll');
 	}
 
 	request.onreadystatechange = function() {
@@ -33,11 +36,16 @@ function handleResponse(responseText) {
 	etag = responseJSON._etag;
 	var all = responseJSON._members;
 	var messages = [];
+	console.log('got response');
 	for (var i=0; i<all.length; i++) {
 		var item = all[i];
 		// consider the 'text' property to be the essential one
-		if ('text' in item) {
-			messages.push(item)
+		var now = Date.now();
+		if ('text' in item && 'time' in item) {
+			item.timeDate = new Date(Number(message.time))
+			if (now - time.timeDate < 86400) {
+				messages.push(item)
+			}
 		}
 	}
 	messages.sort(function(a,b){return Number(a.time)-Number(b.time)});
