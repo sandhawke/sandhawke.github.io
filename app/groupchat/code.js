@@ -42,8 +42,8 @@ function handleResponse(responseText) {
 		// consider the 'text' property to be the essential one
 		var now = Date.now();
 		if ('text' in item && 'time' in item) {
-			item.timeDate = new Date(Number(message.time))
-			if (now - time.timeDate < 86400) {
+			item.timeDate = new Date(Number(item.time))
+			if (now - item.timeDate < 86400) {
 				messages.push(item)
 			}
 		}
