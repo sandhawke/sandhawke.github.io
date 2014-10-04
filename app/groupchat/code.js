@@ -45,14 +45,22 @@ function handleResponse(responseText) {
 	// not being clever, just remove and re-create the whole "out" element
 	var out = document.getElementById("out")
 	while(out.firstChild) { out.removeChild(out.firstChild) }
+	var padding = String("                             ");
 	for (i=0; i<messages.length; i++) {
 		var message = messages[i];
-		message.timeDate = new Date(Number(message.time))
-		var div = document.createElement("pre");
-		div.innerHTML = message.timeDate.toLocaleString()+"  ";
-		div.appendChild(document.createTextNode(message.text));
-		out.appendChild(div);
+		if (Number(message.time) > 0) {
+			var div = document.createElement("span");
+			message.timeDate = new Date(Number(message.time))
+			var date = message.timeDate.toLocaleString();
+			var line = date + padding.slice(5).slice(date.length);
+			line += " "+message._owner;
+			line += padding.slice(message._owner.length)+"  ";
+			line += message.text+"\n";
+			div.appendChild(document.createTextNode(line));
+			out.appendChild(div);
+		}
 	}
+	window.scrollTo(0,document.body.scrollHeight);
 	document.getElementById("chat").style.visibility = "visible"
 	// wait for 100ms then reload when there's new data.  If data
 	// comes faster than that, we don't really want it.
