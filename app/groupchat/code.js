@@ -61,10 +61,14 @@ function handleResponse(responseText) {
 			var div = document.createElement("span");
 			message.timeDate = new Date(Number(message.time))
 			var date = message.timeDate.toLocaleString();
-			var line = date + padding.slice(5).slice(date.length);
+			var line = "  "+date + padding.slice(5).slice(date.length);
 			line += " "+message._owner;
 			line += padding.slice(message._owner.length)+"  ";
 			line += message.text+"\n";
+			var link = document.createElement("a");
+			link.href=message._id;
+			link.appendChild(document.createTextNode("item"));
+			div.appendChild(link);
 			div.appendChild(document.createTextNode(line));
 			out.appendChild(div);
 		}
