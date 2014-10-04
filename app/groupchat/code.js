@@ -40,7 +40,7 @@ function handleResponse(responseText) {
 			messages.push(item)
 		}
 	}
-	messages.sort(function(a,b){return a.time-b.time});
+	messages.sort(function(a,b){return Number(a.time)-Number(b.time)});
 	
 	// not being clever, just remove and re-create the whole "out" element
 	var out = document.getElementById("out")

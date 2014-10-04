@@ -12,6 +12,11 @@
 
 */
 
+function CrosscloudPodClient(options) {
+
+}
+
+
 var pod = function () {
 
     // We're using Crockford's suggested maximal-encapsulation style,
@@ -19,24 +24,36 @@ var pod = function () {
     // tinkering with implementation internals.
     pod = {}
 
-    // GET/SET items.  This interface is a lot like LocalStorage, but
+    // GET/SET items.  This interface is similar to LocalStorage, but
     // of course it's not local, and in fact is able to see other
-    // people's public data.  
+    // people's public data.
     // 
     // The item values must be javascript objects.  Note that property
     // names starting with underscore are reserved.  Specifically:
     //
-    //    _id is the global identifier (URL) of the object
-    //    _owner is the id of the system (pod) which owns this object
-    //    _etag is a string which will change whenever any part of the 
-    //     object changes.  In general etags will never be reused, although
-    //     they can be if the item returns to a prior state.
-    //    _public is a boolean indicating whether the item is visible to
-    //     the public or requires authorization to read
-    //    _content when present means that this resource behaves in part 
-    //     as a conventional web page.   This might be html, css, javascript, 
-    //     a jpeg, etc.   Requires _contentType also be set
-    //    _contentType the standard IANA media type of _content, if present
+    //    _id is the global identifier of the object.  It will
+    //    generally be an https URL and can be accessed through normal
+    //    means (eg a browser or curl).
+	//
+    //    _owner is the id of the user's storage space (pod) which
+    //    owns this object.  This can be considered to identify the
+    //    user responsible for creating this item (in some app).
+	//
+    //    _etag is a string which will change whenever any part of the
+    //     object changes.  In general etags will never be reused,
+    //     although they might be if the item returns to a prior state.
+	//
+    //    _public is a boolean indicating whether the item is visible
+    //     to the public or requires authorization to read (NOT
+    //     IMPLEMENTED)
+	//
+    //    _content when present means that this resource behaves in
+    //     part as a conventional web page.  This might be html, css,
+    //     javascript, a jpeg, etc.  Requires _contentType also be
+    //     set.  (NOT IMPLEMENTED)
+	//
+    //    _contentType the standard IANA media type of _content, if
+    //    present (NOT IMPLEMENTED)
     //
     // It will soon be an error to use an undefined property.  See
     // defineProperty.
@@ -48,21 +65,47 @@ var pod = function () {
     // add a new item to the pod storage, letting the pod assign the id
     //
     // calls callback(id, err) when done
-    pod.createItem = function (item, callback) {
+	//
+	// options = {
+	//
+	//     container: item in which to create this item; if container is 
+	//                moved or removed, this item will be, too.  If absent,
+	//                item is created directly in the pod (root container)
+	//
+	//     name: name for new item; if missing, a name will be
+	//                assigned (typically a sequence number).  It is
+	//                an error to state a name that's already taken.
+	//                Invalid characters will be URL-escaped.
+	//
+	//     slug: like name, but only a hint; server will modify if
+	//                necessary to make a reasonable-looking and
+	//                unique name.
+	//
+	//     public: boolean initial value for _public
+	//  
+	// }
+	//
+    pod.createItem = function (newItemData, options, callback) {
     }
 
 
-    // set new data for item, creating if necessary
+    // Modify item, replacing item newData._id with the given data.
     // 
-	// if an etag is provided (not null/undefined), then
-	// the system will only do the setItem if the item
-	// hasn't changed since the version with that etag.
-	// This makes it possible to over overwriting data
-	// from other sources.
+	// If the _etag property is present, it is handled like an HTTP
+	// ETag in a PUTs If-Match header.  That is, the replaceItem call
+	// will fail if it turns out someone has modified the item in some
+	// way.
     // 
     // calls callback(err) when done
-    pod.setItem = function (id, newData, etag, callback) {
+    pod.replaceItem = function (newData, callback) {
     }
+
+	// Modify item, like replaceItem, but only changing those
+	// properties which are present in overlayData.  Use null values
+	// to remove properties.  Values which are objects are handled
+	// recursively as overlays.
+	pod.overlayItem = function (overlayData, callback) {
+	}
 
 
     // get the data (and etag) for given item, or
@@ -272,4 +315,22 @@ var pod = function () {
     }
 
 
+	// Skins: look on the pod for items like { app:foo, defaultAppPreference: 100 }
+	// and of the apps that say they can skin the data item, use the one with the 
+	// highest preference
+	//
+
+	// Members.   Let's make _members be { id: item, ... } 
+	// instead of [ { id: item }, ... ]
+	
+	// Can we abstract membership?
+	//
+	//    item._members   is a special value type, it's an { id: item } object
+	//
+	// for items which are classes ( object sets )
+	//
+	// Actually, that's just how object-sets are coded, I think.
+	// String set is { string: true }, etc.
+	//
+	// This doesn't go well with LDP paging....
 }();
