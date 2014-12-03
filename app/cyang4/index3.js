@@ -1,4 +1,18 @@
 var pod = crosscloud.connect();
+
+    var conditions = {"1": "Like New",
+                        "2": "Excellent",
+                        "3": "Great",
+                        "4": "Good",
+                        "5": "Okay",
+                        "6": "Passable",
+                        "7": "Poor",
+                        "8": "Falling Apart",
+                        "9": "Junk",
+                        "10": "Other"};
+
+
+
 pod.onLogin(function (userID){
 
 	$("#products").html("waiting for data...");
@@ -176,18 +190,6 @@ pod.onLogin(function (userID){
     });*/
 
     //var show = 12;
-
-    var conditions = {"1": "Like New",
-                        "2": "Excellent",
-                        "3": "Great",
-                        "4": "Good",
-                        "5": "Okay",
-                        "6": "Passable",
-                        "7": "Poor",
-                        "8": "Falling Apart",
-                        "9": "Junk",
-                        "10": "Other"};
-
 
     
 
