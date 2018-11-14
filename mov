@@ -1,0 +1,22 @@
+#
+# I know the media-type is wrong.  This will have to move.  That's
+# kind of the point.
+#
+#
+# See https://github.com/sandhawke/schemove for some more explanation
+#
+
+@prefix mov: <https://sandhawke.github.com/mov#>.
+@prefix owl: <http://www.w3.org/2002/07/owl#>.
+
+# I'm not sure we need of these, but it seems easy to conflate these
+# two. For example, "Person born at time xxx and location yyy" could
+# be defining that person or could be defining the predicate which is
+# true of any such person.
+
+# I'm not sure we need the "probably unique" part, but I'll include it for now
+mov:propdef a owl:InverseFunctionalProperty;
+  mov:propdef 'a definition of an RDF Property, written to be both unambiguous and probably unique. To be "unambiguous", the definition should be written so when experts read it carefully, their understandings of the meaning will be close enough to avoid problems.  To be "probably unique", the definition should be long and detailed enough two it is extremely unlikely two people would write the exact same text while meaning different things.'
+
+mov:def a owl:InverseFunctionalProperty;
+  mov:propdef 'some text describing or defining the subject in sufficient detail that careful readers would be extremely unlikely to misunderstand which entity is being described. That is, when you read the definition text, it should leave you confident you either know which entity is being described or that you do not.'
